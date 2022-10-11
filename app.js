@@ -8,8 +8,8 @@ const SpotifyWebApi = require("spotify-web-api-node");
 const app = express();
 
 app.set("view engine", "hbs");
-app.set("views", __dirname + "/views");
-app.use(express.static(__dirname + "/public"));
+app.set("views", "/views");
+app.use(express.static("/public"));
 
 // setting the spotify-api goes here:
 const spotifyApi = new SpotifyWebApi({
@@ -25,7 +25,6 @@ spotifyApi
     console.log("Something went wrong when retrieving an access token", error)
   );
 
-hbs.registerPartials(__dirname + "/views/partials", function (err) {});
 app.set("view engine", "hbs");
 app.set("views", __dirname + "/views");
 
@@ -34,9 +33,22 @@ app.use(express.static(__dirname + "/public"));
 
 app.get("/", (req, res, next) => {
   console.log("We are in the root route");
-  res.send("Hello from express");
+  //res.send("Hello from express");
 
-  res.render("index.hbs");
+  res.render("index");
+});
+app.get("/artist-search", (req, res, next) => {
+  res.render("artist-search");
+  console.log(req.query + "  Name: " + req.query.search);
+  spotifyApi
+    .searchArtists(req.query.search)
+    .then((data) => {
+      console.log("The received data from the API: ", data.body);
+      console.log(data);
+    })
+    .catch((err) =>
+      console.log("The error while searching artists occurred: ", err)
+    );
 });
 // --- ---
 app.listen(3000, () =>
